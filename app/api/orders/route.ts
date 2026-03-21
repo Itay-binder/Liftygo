@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getUserProfile } from "@/lib/auth/profile";
-import { authDisabled, SESSION_COOKIE } from "@/lib/auth/session";
-import { getAdminAuth } from "@/lib/firebase/admin";
+import { getVerifiedAuthFromRequest } from "@/lib/auth/fromRequest";
+import { ensureUserDoc, getUserProfile } from "@/lib/auth/profile";
+import { authDisabled } from "@/lib/auth/session";
 import {
   fetchSheetMatrix,
   filterByDateRange,
@@ -18,17 +18,16 @@ export async function GET(req: NextRequest) {
   const dateTo = req.nextUrl.searchParams.get("date_to");
 
   if (!authDisabled()) {
-    const cookie = req.cookies.get(SESSION_COOKIE)?.value;
-    if (!cookie) {
+    const authUser = await getVerifiedAuthFromRequest(req);
+    if (!authUser) {
       return NextResponse.json(
         { ok: false, error: "Unauthorized" },
         { status: 401 }
       );
     }
     try {
-      const auth = getAdminAuth();
-      const decoded = await auth.verifySessionCookie(cookie, true);
-      const profile = await getUserProfile(decoded.uid, decoded.email);
+      await ensureUserDoc(authUser.uid, authUser.email);
+      const profile = await getUserProfile(authUser.uid, authUser.email);
       if (!profile) {
         return NextResponse.json(
           { ok: false, error: "No profile" },
