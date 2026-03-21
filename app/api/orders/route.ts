@@ -28,7 +28,7 @@ export async function GET(req: NextRequest) {
     try {
       const auth = getAdminAuth();
       const decoded = await auth.verifySessionCookie(cookie, true);
-      const profile = await getUserProfile(decoded.uid);
+      const profile = await getUserProfile(decoded.uid, decoded.email);
       if (!profile) {
         return NextResponse.json(
           { ok: false, error: "No profile" },

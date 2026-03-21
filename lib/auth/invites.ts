@@ -13,7 +13,7 @@ export async function mayCreateSession(
 ): Promise<boolean> {
   if (isAdminEmail(email)) return true;
 
-  const existing = await getUserProfile(uid);
+  const existing = await getUserProfile(uid, email);
   if (existing) return true;
 
   if (!email) return false;

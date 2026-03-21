@@ -33,7 +33,7 @@ export async function getSessionWithProfile(): Promise<{
 } | null> {
   const user = await getSessionUser();
   if (!user) return null;
-  const profile = await getUserProfile(user.uid);
+  const profile = await getUserProfile(user.uid, user.email);
   if (!profile) return null;
   return { ...user, profile };
 }
