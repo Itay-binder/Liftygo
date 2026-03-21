@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Liftygo API</title>
+    <style>
+      body {
+        font-family: system-ui, sans-serif;
+        max-width: 40rem;
+        margin: 2rem auto;
+        padding: 0 1rem;
+        line-height: 1.5;
+      }
+      code {
+        background: #f1f5f9;
+        padding: 0.15rem 0.35rem;
+        border-radius: 4px;
+        font-size: 0.9em;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Liftygo</h1>
+    <p>אין כאן דף אתר — זה פרויקט API + סקריפט embed. זה תקין.</p>
+    <ul>
+      <li>
+        <strong>סקריפט לאלמנטור:</strong>
+        <code id="embed-url"></code>
+      </li>
+      <li>
+        <strong>בדיקת API (החלף utm):</strong>
+        <code id="api-url"></code>
+      </li>
+    </ul>
+    <p><a href="/embed.js">הורדה / הצגת embed.js</a></p>
+    <script>
+      var origin = window.location.origin;
+      document.getElementById('embed-url').textContent =
+        '<scr' +
+        'ipt src="' +
+        origin +
+        '/embed.js" data-api-base="' +
+        origin +
+        '/api" defer></scr' +
+        'ipt>';
+      document.getElementById('api-url').textContent =
+        origin + '/api/affiliate-data?utm_source=YOUR_UTM';
+    </script>
+  </body>
+</html>

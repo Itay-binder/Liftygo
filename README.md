@@ -10,27 +10,32 @@
 ├── .gitignore
 ├── package.json         # תלות googleapis לפונקציית Vercel
 ├── api/                 # פונקציות שרת (Vercel) — קריאה ל-Google Sheets
-├── frontend/
-│   ├── embed.js         # נקודת הכניסה לאלמנטור: קובץ JS חיצוני אחד
-│   └── dev.html         # דף בדיקה מקומית (לא לחשוף לייצור כ-URL ציבורי נדרש)
+├── public/
+│   ├── embed.js         # נטען מ-Vercel כ־/embed.js (אלמנטור)
+│   ├── index.html       # דף הסבר בשורש (לא 404)
+│   └── dev.html         # בדיקה: /dev.html?utm_source=...
 ```
 
-- **`frontend/embed.js`** — נטען בשורה אחת באלמנטור; יוצר את ה-DOM, קורא `utm_source`, מציג פילטר תאריכים וטבלה, וקורא ל-API ב-Backend.
+- **`public/embed.js`** — נטען בשורה אחת באלמנטור; ב-Vercel זמין ב־`https://YOUR_PROJECT.vercel.app/embed.js`.
 - **`api/affiliate-data.js`** — קורא מ-Google Sheets עם Service Account מ-`GOOGLE_SERVICE_ACCOUNT_JSON` (רק ב-Vercel).
 
 ## הטמעה באלמנטור (שורה אחת)
 
-העלה את `frontend/embed.js` ל-CDN או לתיקיית מדיה בוורדפרס, והדבק בווידג'ט HTML מותאם אישית:
+אם הפרויקט ב-Vercel מחובר לריפו, אפשר להשתמש ישירות ב־`/embed.js` של אותו דומיין:
 
 ```html
 <script
-  src="https://YOUR_DOMAIN/path/embed.js"
+  src="https://YOUR_VERCEL_PROJECT.vercel.app/embed.js"
   data-api-base="https://YOUR_VERCEL_PROJECT.vercel.app/api"
   defer
 ></script>
 ```
 
-- **`data-api-base`** — כתובת בסיס ל-API (ללא סלאש בסוף). אם לא מוגדר, הסקריפט ישתמש בערך ב-`window.AFFILIATE_DASHBOARD_API_BASE` אם קיים.
+חלופה: להעלות את `public/embed.js` למדיה בוורדפרס / CDN.
+
+- **`data-api-base`** — כתובת בסיס ל-API (ללא סלאש בסוף). אם לא מוגדר, הסקריפט ישתמש ב־`window.AFFILIATE_DASHBOARD_API_BASE` אם קיים.
+
+**הערה:** כתובת השורש `/` של פרויקט API-only עשויה הייתה להחזיר 404 לפני הוספת `public/index.html` — זה לא אומר שה-API שבור. לבדוק תמיד את `/api/affiliate-data?...`.
 
 ## Vercel — משתני סביבה (אחרי שהעלית את ה-JSON)
 
@@ -53,7 +58,7 @@
 
 ## פיתוח מקומי
 
-פתח את `frontend/dev.html` בדפדפן (או דרך שרת סטטי פשוט) כדי לבדוק את הווידג'ט. הוסף לכתובת פרמטרים לבדיקה, למשל: `?utm_source=demo_partner`.
+מקומית: מתוך תיקיית `public` הרץ שרת סטטי (למשל `npx serve public`) ופתח `/dev.html?utm_source=demo_partner`. ב-Vercel: `https://YOUR_PROJECT.vercel.app/dev.html?utm_source=...` (הוסף `data-api-base` ב-HTML אם תרצה לבדוק מול API; לבדיקת API ישירות השתמש בכתובת `/api/affiliate-data`).
 
 ## דרישות גיליון
 
