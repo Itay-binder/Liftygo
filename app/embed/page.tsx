@@ -12,8 +12,8 @@ export default function EmbedPage() {
             padding: 16,
             minHeight: "40vh",
             background:
-              "linear-gradient(160deg, #f1f5f9 0%, #e8eef5 45%, #f8fafc 100%)",
-            color: "#64748b",
+              "linear-gradient(160deg, var(--lg-50) 0%, var(--lg-100) 45%, var(--lg-surface) 100%)",
+            color: "var(--lg-700)",
             fontFamily: "system-ui, sans-serif",
           }}
         >

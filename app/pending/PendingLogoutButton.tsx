@@ -17,17 +17,8 @@ export default function PendingLogoutButton() {
   return (
     <button
       type="button"
+      className="pending-logout"
       onClick={() => void logout()}
-      style={{
-        marginTop: 24,
-        padding: "10px 20px",
-        borderRadius: 10,
-        border: "1px solid #cbd5e1",
-        background: "#fff",
-        color: "#64748b",
-        cursor: "pointer",
-        fontSize: 14,
-      }}
     >
       התנתקות
     </button>

@@ -1,0 +1,17 @@
+/**
+ * פלטת Liftygo — משתמשים ב־var(--lg-*) בכל האפליקציה
+ */
+:root {
+  --lg-50: #e5daf8;
+  --lg-100: #d3bef4;
+  --lg-200: #b795ec;
+  --lg-300: #a379e7;
+  --lg-400: #8952e0;
+  --lg-500: #7434db;
+  --lg-600: #6023c0;
+  --lg-700: #4f1d9e;
+  --lg-800: #3b1676;
+  --lg-surface: #fefcff;
+  --lg-shadow: rgba(59, 22, 118, 0.12);
+  --lg-shadow-strong: rgba(59, 22, 118, 0.2);
+}

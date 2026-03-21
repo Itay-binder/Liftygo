@@ -4,6 +4,7 @@ import { signInWithPopup, signOut } from "firebase/auth";
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { getFirebaseAuth, getGoogleProvider } from "@/lib/firebase/client";
+import "./login.css";
 
 export default function LoginForm() {
   const searchParams = useSearchParams();
@@ -56,51 +57,19 @@ export default function LoginForm() {
   }
 
   return (
-    <main
-      style={{
-        minHeight: "100vh",
-        display: "grid",
-        placeItems: "center",
-        padding: 24,
-        background: "#f1f5f9",
-      }}
-    >
-      <div
-        style={{
-          background: "#fff",
-          padding: 32,
-          borderRadius: 16,
-          boxShadow: "0 8px 30px rgba(15,23,42,0.08)",
-          maxWidth: 400,
-          width: "100%",
-          textAlign: "center",
-        }}
-      >
-        <h1 style={{ marginTop: 0, fontSize: "1.35rem" }}>התחברות ל־Liftygo</h1>
-        <p style={{ color: "#64748b", fontSize: 14 }}>
-          המשך עם חשבון Google
-        </p>
+    <main className="login-root">
+      <div className="login-card">
+        <h1 className="login-title">התחברות ל־Liftygo</h1>
+        <p className="login-sub">המשך עם חשבון Google</p>
         <button
           type="button"
+          className="login-btn"
           onClick={() => void onGoogle()}
           disabled={loading}
-          style={{
-            marginTop: 20,
-            padding: "12px 28px",
-            borderRadius: 10,
-            border: "none",
-            background: "#2563eb",
-            color: "#fff",
-            fontWeight: 600,
-            cursor: loading ? "wait" : "pointer",
-            fontSize: "1rem",
-          }}
         >
           {loading ? "מתחבר…" : "המשך עם Google"}
         </button>
-        {err && (
-          <p style={{ color: "#b91c1c", marginTop: 16, fontSize: 14 }}>{err}</p>
-        )}
+        {err && <p className="login-err">{err}</p>}
       </div>
     </main>
   );
