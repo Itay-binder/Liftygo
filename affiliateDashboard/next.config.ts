@@ -1,7 +1,11 @@
+import path from "path";
 import type { NextConfig } from "next";
 
-/** Allow embedding the dashboard in Elementor (any parent origin). API stays server-only. */
+/** Monorepo: trace files from repo root (single lockfile at parent). */
 const nextConfig: NextConfig = {
+  outputFileTracingRoot: path.join(__dirname, ".."),
+
+  /** Allow embedding the dashboard in Elementor (any parent origin). API stays server-only. */
   async headers() {
     return [
       {

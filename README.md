@@ -2,13 +2,23 @@
 
 דשבורד לפי נתוני Google Sheets (קריאה בצד שרת בלבד). מסנן התחלתי לפי `utm_source`.
 
+## מבנה הריפו
+
+הריפו מיועד למונורפו פנים־עסקי: כל פרויקט בתיקייה משלו.
+
+- `affiliateDashboard/` — אפליקציית Next.js (דשבורד שותפים, `/embed`, API).
+
+בשורש הריפו יש `package.json` עם **npm workspaces**; `npm install` פעם אחת בשורש מטפל בכל הפרויקטים.
+
 ## הרצה מקומית
 
-1. העתק `.env.example` ל־`.env.local` ומלא את הערכים.
+1. העתק `affiliateDashboard/.env.example` ל־`affiliateDashboard/.env.local` ומלא את הערכים.
 2. בגוגל שיטס: שתף את הגיליון עם כתובת ה־**Service account** (`client_email` ב־JSON) — הרשאת צפייה מספיקה.
-3. `npm install` ואז `npm run dev` — פתח [http://localhost:3000/embed](http://localhost:3000/embed).
+3. `npm install` בשורש הריפו, ואז `npm run dev` — פתח [http://localhost:3000/embed](http://localhost:3000/embed).
 
 ## Vercel
+
+ב־Project → Settings → **General** → **Root Directory** קבע `affiliateDashboard` (כדי שהבילד ירוץ על אפליקציית ה־Next).
 
 ב־Project → Settings → Environment Variables הוסף:
 
