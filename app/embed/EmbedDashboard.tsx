@@ -3,6 +3,9 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 
+/** חייב להתאים לסקריפט ההטמעה באלמנטור */
+export const LIFTYGO_EMBED_MSG = "liftygo-embed-height" as const;
+
 type ApiOk = {
   ok: true;
   headers: string[];
@@ -11,6 +14,45 @@ type ApiOk = {
 };
 
 type ApiErr = { ok: false; error: string };
+
+function useEmbedHeightNotify(
+  loading: boolean,
+  rowCount: number | undefined,
+  err: string | null
+) {
+  const notify = useCallback(() => {
+    if (typeof window === "undefined") return;
+    if (window.parent === window) return;
+    const height = Math.max(
+      document.documentElement.scrollHeight,
+      document.body?.scrollHeight ?? 0
+    );
+    window.parent.postMessage(
+      { type: LIFTYGO_EMBED_MSG, height },
+      "*"
+    );
+  }, []);
+
+  useEffect(() => {
+    notify();
+    const t = window.setTimeout(notify, 100);
+    const t2 = window.setTimeout(notify, 500);
+    return () => {
+      window.clearTimeout(t);
+      window.clearTimeout(t2);
+    };
+  }, [notify, loading, rowCount, err]);
+
+  useEffect(() => {
+    window.addEventListener("resize", notify);
+    const ro = new ResizeObserver(() => notify());
+    ro.observe(document.documentElement);
+    return () => {
+      window.removeEventListener("resize", notify);
+      ro.disconnect();
+    };
+  }, [notify]);
+}
 
 export default function EmbedDashboard() {
   const searchParams = useSearchParams();
@@ -52,134 +94,82 @@ export default function EmbedDashboard() {
     void load();
   }, [load]);
 
+  useEmbedHeightNotify(loading, data?.rows?.length, err);
+
   const displayHeaders = data?.headers?.length
     ? data.headers
     : ["אין עמודות"];
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        padding: "16px 16px 32px",
-        maxWidth: "100%",
-      }}
-    >
-      <header
-        style={{
-          display: "flex",
-          flexWrap: "wrap",
-          gap: 12,
-          alignItems: "flex-end",
-          marginBottom: 16,
-          borderBottom: "1px solid #2a3441",
-          paddingBottom: 12,
-        }}
-      >
-        <div style={{ flex: "1 1 200px" }}>
-          <div style={{ fontSize: 12, opacity: 0.75, marginBottom: 4 }}>
-            סינון לפי utm_source
+    <div className="lg-root">
+      <div className="lg-card">
+        <header className="lg-header">
+          <div className="lg-title-block">
+            <h1 className="lg-title">דשבורד Liftygo</h1>
+            <p className="lg-sub">
+              סינון לפי מקור (utm_source). השאר ריק כדי להציג את כל הרשומות.
+            </p>
           </div>
-          <input
-            value={utm}
-            onChange={(e) => setUtm(e.target.value)}
-            placeholder="לדוגמה: meta, ig"
-            dir="ltr"
-            style={{
-              width: "100%",
-              maxWidth: 320,
-              padding: "10px 12px",
-              borderRadius: 8,
-              border: "1px solid #3d4a5c",
-              background: "#151c24",
-              color: "#e7ecf3",
-              fontSize: 15,
-            }}
-          />
-        </div>
-        <button
-          type="button"
-          onClick={() => void load()}
-          style={{
-            padding: "10px 16px",
-            borderRadius: 8,
-            border: "1px solid #3d6fd9",
-            background: "#1e3a6e",
-            color: "#e7ecf3",
-            cursor: "pointer",
-            fontWeight: 600,
-          }}
-        >
-          רענן
-        </button>
-        {data && (
-          <div style={{ fontSize: 14, opacity: 0.9 }}>
-            רשומות: <strong>{data.count}</strong>
+          <div className="lg-field">
+            <label className="lg-label" htmlFor="utm-source-input">
+              utm_source
+            </label>
+            <input
+              id="utm-source-input"
+              className="lg-input"
+              value={utm}
+              onChange={(e) => setUtm(e.target.value)}
+              placeholder="לדוגמה: meta, ig"
+              dir="ltr"
+              autoComplete="off"
+            />
           </div>
-        )}
-      </header>
+          <div className="lg-actions">
+            <button type="button" className="lg-btn" onClick={() => void load()}>
+              רענן
+            </button>
+            {data && (
+              <span className="lg-badge">{data.count} רשומות</span>
+            )}
+          </div>
+        </header>
 
-      {loading && <p style={{ opacity: 0.85 }}>טוען…</p>}
-      {err && !loading && (
-        <p style={{ color: "#ff8a8a" }} role="alert">
-          {err}
-        </p>
-      )}
+        <div className="lg-body">
+          {loading && <p className="lg-muted">טוען נתונים…</p>}
+          {err && !loading && (
+            <p className="lg-error" role="alert">
+              {err}
+            </p>
+          )}
 
-      {!loading && data && data.rows.length === 0 && (
-        <p style={{ opacity: 0.85 }}>אין שורות שתואמות את הסינון.</p>
-      )}
+          {!loading && data && data.rows.length === 0 && (
+            <p className="lg-muted">אין שורות שתואמות את הסינון.</p>
+          )}
 
-      {!loading && data && data.rows.length > 0 && (
-        <div style={{ overflow: "auto", borderRadius: 8, border: "1px solid #2a3441" }}>
-          <table
-            style={{
-              borderCollapse: "collapse",
-              width: "max-content",
-              minWidth: "100%",
-              fontSize: 13,
-            }}
-          >
-            <thead>
-              <tr style={{ background: "#151c24" }}>
-                {displayHeaders.map((h) => (
-                  <th
-                    key={h}
-                    style={{
-                      padding: "10px 12px",
-                      textAlign: "right",
-                      borderBottom: "1px solid #2a3441",
-                      whiteSpace: "nowrap",
-                      fontWeight: 600,
-                    }}
-                  >
-                    {h}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {data.rows.map((row, i) => (
-                <tr key={i} style={{ background: i % 2 ? "#121820" : "#0f1419" }}>
-                  {displayHeaders.map((h) => (
-                    <td
-                      key={h}
-                      style={{
-                        padding: "8px 12px",
-                        borderBottom: "1px solid #1f2833",
-                        verticalAlign: "top",
-                        maxWidth: 360,
-                        wordBreak: "break-word",
-                      }}
-                    >
-                      {row[h] ?? ""}
-                    </td>
+          {!loading && data && data.rows.length > 0 && (
+            <div className="lg-table-scroll">
+              <table className="lg-table">
+                <thead>
+                  <tr>
+                    {displayHeaders.map((h) => (
+                      <th key={h}>{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {data.rows.map((row, i) => (
+                    <tr key={i}>
+                      {displayHeaders.map((h) => (
+                        <td key={h}>{row[h] ?? ""}</td>
+                      ))}
+                    </tr>
                   ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
-      )}
+      </div>
     </div>
   );
 }

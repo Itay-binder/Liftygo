@@ -18,18 +18,50 @@
 
 אחרי `git push`, הפריסה אמורה להיבנות אוטומטית.
 
-## הטמעה ב־Elementor (מומלץ: iframe)
+## הטמעה ב־Elementor (רוחב מלא + גובה דינמי)
 
-בווידג'ט HTML הדבק (החלף את הדומיין):
+הדף `/embed` מעוצב בהיר ונקי (מתאים לרקע לבן). אפשר להטמיע רק **iframe** — או iframe + סקריפט קטן שמתאים את **גובה** ה־iframe לתוכן (מומלץ).
+
+החלף `https://liftygo.vercel.app` בכתובת הפרויקט שלך.
+
+### גרסה מלאה (מומלץ — נראה “שטוח” ולא חתוך)
+
+```html
+<div class="liftygo-embed-wrap" style="width:100%;max-width:100%;margin:0;padding:0;line-height:0;">
+  <iframe
+    id="liftygo-embed-iframe"
+    src="https://liftygo.vercel.app/embed"
+    title="Liftygo"
+    style="width:100%;border:0;display:block;min-height:560px;border-radius:14px;box-shadow:0 8px 30px rgba(15,23,42,0.08);"
+    loading="lazy"
+    referrerpolicy="strict-origin-when-cross-origin"
+  ></iframe>
+</div>
+<script>
+(function () {
+  var iframe = document.getElementById("liftygo-embed-iframe");
+  if (!iframe) return;
+  window.addEventListener("message", function (e) {
+    var d = e.data;
+    if (!d || d.type !== "liftygo-embed-height") return;
+    var h = parseInt(d.height, 10);
+    if (h > 240) iframe.style.height = h + "px";
+  });
+})();
+</script>
+```
+
+אם אלמנטור **מסיר את תגי `<script>`** — השתמש בווידג'ט “HTML” עם אפשרות סקריפטים, או הטמע רק את ה־`iframe` (ללא הסקריפט) והגדר `min-height` גבוה יותר (למשל `min-height:85vh`).
+
+### גרסה פשוטה (רק iframe)
 
 ```html
 <iframe
-  src="https://YOUR-PROJECT.vercel.app/embed?utm_source=meta"
+  src="https://liftygo.vercel.app/embed?utm_source=meta"
   width="100%"
-  height="900"
-  style="border:0;border-radius:12px;min-height:600px;"
+  style="min-height:85vh;border:0;border-radius:14px;box-shadow:0 8px 30px rgba(15,23,42,0.08);display:block;"
   loading="lazy"
-  title="Liftygo dashboard"
+  title="Liftygo"
 ></iframe>
 ```
 
