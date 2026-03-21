@@ -19,14 +19,15 @@ body.embed-route {
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding-bottom: 4px;
 }
 
 .lg-user-menu {
   position: relative;
   flex-shrink: 0;
-  margin-block: 4px;
-  /* ב־RTL האווטאר בצד שמאל — ריווח מהמסגרת */
+  /*
+   * מרווח אופקי מהקצה: margin-inline-end (ב־RTL = משמאל, ליד האווטאר).
+   * מרווח אנכי מהקצה העליון: בעיקר padding של .lg-header (לא margin-block כאן).
+   */
   margin-inline-end: 12px;
 }
 
@@ -128,8 +129,9 @@ body.embed-route {
   display: flex;
   flex-direction: column;
   gap: 2px;
-  padding: 4px 12px 8px;
-  background: linear-gradient(180deg, var(--lg-surface) 0%, var(--lg-50) 100%);
+  /* top | inline (ימין+שמאל) | bottom — אותו סדר מרווחים מהמסגרת, כולל למעלה */
+  padding: 14px 18px 12px;
+  background: linear-gradient(180deg, #ffffff 0%, var(--lg-surface) 55%, var(--lg-50) 100%);
   border-bottom: 1px solid var(--lg-100);
 }
 
