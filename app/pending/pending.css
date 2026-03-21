@@ -3,13 +3,7 @@
   display: grid;
   place-items: center;
   padding: 24px;
-  background: linear-gradient(
-    165deg,
-    var(--lg-50) 0%,
-    #faf7ff 40%,
-    var(--lg-100) 100%
-  );
-  font-family: system-ui, sans-serif;
+  background: transparent;
 }
 
 .pending-card {
@@ -25,12 +19,15 @@
 .pending-title {
   margin-top: 0;
   font-size: 1.25rem;
+  font-weight: 700;
+  font-family: var(--font-rubik), "Rubik", sans-serif;
   color: var(--lg-800);
 }
 
 .pending-text {
   color: var(--lg-700);
   line-height: 1.5;
+  font-weight: 400;
 }
 
 .pending-logout {
@@ -40,6 +37,8 @@
   border: 1px solid var(--lg-200);
   background: var(--lg-surface);
   color: var(--lg-700);
+  font-family: var(--font-rubik), "Rubik", sans-serif;
+  font-weight: 600;
   cursor: pointer;
   font-size: 14px;
   transition: background 0.12s;

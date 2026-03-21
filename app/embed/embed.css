@@ -1,29 +1,16 @@
-/* דף embed — פלטת Liftygo */
+/* דף embed — פלטת Liftygo + Rubik (מ־layout) */
 
 body.embed-route {
   margin: 0;
-  background: linear-gradient(
-    160deg,
-    var(--lg-50) 0%,
-    var(--lg-100) 45%,
-    var(--lg-surface) 100%
-  );
   color: var(--lg-800);
 }
 
 .lg-root {
   direction: rtl;
   min-height: 100%;
-  padding: clamp(8px, 1.5vw, 16px);
-  background: linear-gradient(
-    160deg,
-    var(--lg-50) 0%,
-    var(--lg-100) 45%,
-    var(--lg-surface) 100%
-  );
+  padding: clamp(10px, 2vw, 20px);
   color: var(--lg-800);
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Heebo", Arial,
-    sans-serif;
+  font-family: inherit;
 }
 
 .lg-header-row {
@@ -32,12 +19,15 @@ body.embed-route {
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding-bottom: 6px;
+  padding-bottom: 4px;
 }
 
 .lg-user-menu {
   position: relative;
   flex-shrink: 0;
+  margin-block: 4px;
+  /* ב־RTL האווטאר בצד שמאל — ריווח מהמסגרת */
+  margin-inline-end: 12px;
 }
 
 .lg-user-avatar {
@@ -50,7 +40,8 @@ body.embed-route {
   align-items: center;
   justify-content: center;
   font-size: 1rem;
-  font-weight: 600;
+  font-weight: 700;
+  font-family: var(--font-rubik), "Rubik", sans-serif;
   color: #fff;
   background: linear-gradient(145deg, var(--lg-400) 0%, var(--lg-600) 100%);
   cursor: pointer;
@@ -89,6 +80,7 @@ body.embed-route {
   padding: 8px 14px 10px;
   font-size: 0.8125rem;
   font-weight: 500;
+  font-family: var(--font-rubik), "Rubik", sans-serif;
   color: var(--lg-800);
   word-break: break-all;
   line-height: 1.35;
@@ -171,6 +163,8 @@ body.embed-route {
   background: var(--lg-surface);
   color: var(--lg-800);
   font-size: 0.9375rem;
+  font-family: var(--font-rubik), "Rubik", sans-serif;
+  font-weight: 500;
   cursor: pointer;
 }
 
@@ -185,6 +179,7 @@ body.embed-route {
   padding: 0;
   font-size: clamp(1.05rem, 2.2vw, 1.28rem);
   font-weight: 700;
+  font-family: var(--font-rubik), "Rubik", sans-serif;
   letter-spacing: -0.02em;
   line-height: 1.15;
   color: var(--lg-800);
@@ -200,7 +195,8 @@ body.embed-route {
 
 .lg-label {
   font-size: 0.75rem;
-  font-weight: 600;
+  font-weight: 700;
+  font-family: var(--font-rubik), "Rubik", sans-serif;
   color: var(--lg-700);
 }
 
@@ -273,7 +269,8 @@ body.embed-route {
   background: var(--lg-50);
   color: var(--lg-700);
   font-size: 0.8125rem;
-  font-weight: 600;
+  font-weight: 700;
+  font-family: var(--font-rubik), "Rubik", sans-serif;
   border: 1px solid var(--lg-200);
 }
 
@@ -284,8 +281,10 @@ body.embed-route {
 .lg-muted {
   margin: 0;
   color: var(--lg-700);
-  opacity: 0.85;
+  opacity: 0.88;
   font-size: 0.9375rem;
+  font-weight: 400;
+  font-family: var(--font-rubik), "Rubik", sans-serif;
 }
 
 .lg-error {
@@ -320,6 +319,7 @@ body.embed-route {
   text-align: right;
   white-space: nowrap;
   font-weight: 700;
+  font-family: var(--font-rubik), "Rubik", sans-serif;
   color: var(--lg-800);
   background: linear-gradient(180deg, var(--lg-50) 0%, #ede4fc 100%);
   border-bottom: 2px solid var(--lg-200);
@@ -333,6 +333,8 @@ body.embed-route {
   max-width: min(360px, 40vw);
   word-break: break-word;
   color: var(--lg-800);
+  font-weight: 400;
+  font-family: var(--font-rubik), "Rubik", sans-serif;
 }
 
 .lg-table tbody tr:nth-child(even) {
@@ -349,4 +351,13 @@ body.embed-route {
     font-size: 0.75rem;
     padding: 8px 10px;
   }
+}
+
+.lg-embed-suspense-fallback {
+  padding: 20px;
+  min-height: 40vh;
+  color: var(--lg-700);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  font-family: var(--font-rubik), "Rubik", sans-serif;
 }

@@ -3,12 +3,7 @@
   display: grid;
   place-items: center;
   padding: 24px;
-  background: linear-gradient(
-    165deg,
-    var(--lg-50) 0%,
-    #faf7ff 40%,
-    var(--lg-100) 100%
-  );
+  background: transparent;
 }
 
 .login-card {
@@ -25,13 +20,16 @@
 .login-title {
   margin-top: 0;
   font-size: 1.35rem;
+  font-weight: 700;
+  font-family: var(--font-rubik), "Rubik", sans-serif;
   color: var(--lg-800);
 }
 
 .login-sub {
   color: var(--lg-700);
   font-size: 14px;
-  opacity: 0.9;
+  font-weight: 400;
+  opacity: 0.92;
 }
 
 .login-btn {
@@ -41,7 +39,8 @@
   border: none;
   background: linear-gradient(180deg, var(--lg-400) 0%, var(--lg-600) 100%);
   color: #fff;
-  font-weight: 600;
+  font-weight: 700;
+  font-family: var(--font-rubik), "Rubik", sans-serif;
   cursor: pointer;
   font-size: 1rem;
   box-shadow: 0 2px 10px rgba(96, 35, 192, 0.35);
@@ -64,4 +63,5 @@
   color: #b91c1c;
   margin-top: 16px;
   font-size: 14px;
+  font-weight: 500;
 }

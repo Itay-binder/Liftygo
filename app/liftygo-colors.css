@@ -14,4 +14,12 @@
   --lg-surface: #fefcff;
   --lg-shadow: rgba(59, 22, 118, 0.12);
   --lg-shadow-strong: rgba(59, 22, 118, 0.2);
+  /* דף בית: לבן למעלה → לבנדר בהיר למטה */
+  --lg-bg-page: linear-gradient(
+    180deg,
+    #ffffff 0%,
+    #faf8ff 38%,
+    var(--lg-50) 72%,
+    rgba(211, 190, 244, 0.55) 100%
+  );
 }
