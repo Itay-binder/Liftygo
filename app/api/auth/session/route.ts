@@ -2,6 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { mayCreateSession } from "@/lib/auth/invites";
 import { ensureUserDoc } from "@/lib/auth/profile";
 import { authDisabled, SESSION_COOKIE } from "@/lib/auth/session";
+import {
+  getSessionCookieDeleteOptions,
+  getSessionCookieSetOptions,
+} from "@/lib/auth/sessionCookieOptions";
 import { getSessionExpiresMs } from "@/lib/auth/sessionDuration";
 import { getAdminAuth } from "@/lib/firebase/admin";
 
@@ -39,13 +43,11 @@ export async function POST(req: NextRequest) {
       expiresIn: expiresMs,
     });
     const res = NextResponse.json({ ok: true });
-    res.cookies.set(SESSION_COOKIE, sessionCookie, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      path: "/",
-      maxAge: Math.floor(expiresMs / 1000),
-    });
+    res.cookies.set(
+      SESSION_COOKIE,
+      sessionCookie,
+      getSessionCookieSetOptions(Math.floor(expiresMs / 1000))
+    );
     return res;
   } catch (e) {
     const msg = e instanceof Error ? e.message : "Unknown error";
@@ -55,10 +57,6 @@ export async function POST(req: NextRequest) {
 
 export async function DELETE() {
   const res = NextResponse.json({ ok: true });
-  res.cookies.set(SESSION_COOKIE, "", {
-    httpOnly: true,
-    path: "/",
-    maxAge: 0,
-  });
+  res.cookies.set(SESSION_COOKIE, "", getSessionCookieDeleteOptions());
   return res;
 }
