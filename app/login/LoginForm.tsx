@@ -1,12 +1,11 @@
 "use client";
 
 import { signInWithPopup, signOut } from "firebase/auth";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { getFirebaseAuth, getGoogleProvider } from "@/lib/firebase/client";
 
 export default function LoginForm() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const returnTo = searchParams.get("returnTo") || "/embed";
   const [err, setErr] = useState<string | null>(null);
@@ -16,11 +15,20 @@ export default function LoginForm() {
     setErr(null);
     setLoading(true);
     try {
+      if (typeof window !== "undefined" && window.self !== window.top) {
+        try {
+          await document.requestStorageAccess?.();
+        } catch {
+          /* דפדפנים שונים — ממשיכים בכל זאת */
+        }
+      }
+
       const auth = getFirebaseAuth();
       const cred = await signInWithPopup(auth, getGoogleProvider());
       const idToken = await cred.user.getIdToken();
       const r = await fetch("/api/auth/session", {
         method: "POST",
+        credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ idToken }),
       });
@@ -35,8 +43,11 @@ export default function LoginForm() {
         setErr(data.error ?? "התחברות נכשלה");
         return;
       }
-      router.push(returnTo);
-      router.refresh();
+      const next =
+        returnTo.startsWith("/") && !returnTo.includes("//")
+          ? returnTo
+          : "/embed";
+      window.location.assign(next);
     } catch (e) {
       setErr(e instanceof Error ? e.message : "שגיאה");
     } finally {

@@ -3,8 +3,8 @@ import { mayCreateSession } from "@/lib/auth/invites";
 import { ensureUserDoc } from "@/lib/auth/profile";
 import { authDisabled, SESSION_COOKIE } from "@/lib/auth/session";
 import {
-  getSessionCookieDeleteOptions,
-  getSessionCookieSetOptions,
+  clearSessionCookieOnResponse,
+  setSessionCookieOnResponse,
 } from "@/lib/auth/sessionCookieOptions";
 import { getSessionExpiresMs } from "@/lib/auth/sessionDuration";
 import { getAdminAuth } from "@/lib/firebase/admin";
@@ -43,11 +43,7 @@ export async function POST(req: NextRequest) {
       expiresIn: expiresMs,
     });
     const res = NextResponse.json({ ok: true });
-    res.cookies.set(
-      SESSION_COOKIE,
-      sessionCookie,
-      getSessionCookieSetOptions(Math.floor(expiresMs / 1000))
-    );
+    setSessionCookieOnResponse(res, sessionCookie, Math.floor(expiresMs / 1000));
     return res;
   } catch (e) {
     const msg = e instanceof Error ? e.message : "Unknown error";
@@ -57,6 +53,6 @@ export async function POST(req: NextRequest) {
 
 export async function DELETE() {
   const res = NextResponse.json({ ok: true });
-  res.cookies.set(SESSION_COOKIE, "", getSessionCookieDeleteOptions());
+  clearSessionCookieOnResponse(res);
   return res;
 }
