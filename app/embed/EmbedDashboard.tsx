@@ -84,6 +84,17 @@ export default function EmbedDashboard() {
   const [err, setErr] = useState<string | null>(null);
   const [data, setData] = useState<ApiOk | null>(null);
 
+  const onPresetChange = (next: PresetId) => {
+    if (next === "custom" && preset !== "custom" && preset !== "all") {
+      const r = getPresetRange(preset);
+      if (r) {
+        setCustomFrom(r.from);
+        setCustomTo(r.to);
+      }
+    }
+    setPreset(next);
+  };
+
   const query = useMemo(() => {
     const q = new URLSearchParams();
     if (utm.trim()) q.set("utm_source", utm.trim());
@@ -139,17 +150,19 @@ export default function EmbedDashboard() {
     ? data.headers
     : ["אין עמודות"];
 
+  const presetRange =
+    preset !== "all" && preset !== "custom" ? getPresetRange(preset) : null;
+  const fromValue =
+    preset === "custom" ? customFrom : (presetRange?.from ?? "");
+  const toValue = preset === "custom" ? customTo : (presetRange?.to ?? "");
+  const datesEditable = preset === "custom";
+
   return (
     <div className="lg-root">
       <div className="lg-card">
         <header className="lg-header">
           <div className="lg-title-block">
             <h1 className="lg-title">דשבורד Liftygo</h1>
-            <p className="lg-sub">
-              סינון לפי מקור (utm_source) ולפי זמן — לפי עמודת{" "}
-              <strong>תאריך הזמנה</strong> בגיליון (ניתן לשנות ב־Vercel:
-              GOOGLE_DATE_COLUMN).
-            </p>
           </div>
 
           <div className="lg-filters-grid">
@@ -176,7 +189,9 @@ export default function EmbedDashboard() {
                 id="date-preset-select"
                 className="lg-select"
                 value={preset}
-                onChange={(e) => setPreset(e.target.value as PresetId)}
+                onChange={(e) =>
+                  onPresetChange(e.target.value as PresetId)
+                }
               >
                 {PRESET_OPTIONS.map((o) => (
                   <option key={o.value} value={o.value}>
@@ -184,12 +199,9 @@ export default function EmbedDashboard() {
                   </option>
                 ))}
               </select>
-              <p className="lg-hint">
-                השבוע מתחיל ביום ראשון. תאריכים לפי אזור הזמן של הדפדפן.
-              </p>
             </div>
 
-            {preset === "custom" && (
+            {preset !== "all" && (
               <>
                 <div className="lg-field">
                   <label className="lg-label" htmlFor="date-from">
@@ -199,8 +211,11 @@ export default function EmbedDashboard() {
                     id="date-from"
                     className="lg-input"
                     type="date"
-                    value={customFrom}
-                    onChange={(e) => setCustomFrom(e.target.value)}
+                    value={fromValue}
+                    readOnly={!datesEditable}
+                    onChange={(e) => {
+                      if (datesEditable) setCustomFrom(e.target.value);
+                    }}
                   />
                 </div>
                 <div className="lg-field">
@@ -211,8 +226,11 @@ export default function EmbedDashboard() {
                     id="date-to"
                     className="lg-input"
                     type="date"
-                    value={customTo}
-                    onChange={(e) => setCustomTo(e.target.value)}
+                    value={toValue}
+                    readOnly={!datesEditable}
+                    onChange={(e) => {
+                      if (datesEditable) setCustomTo(e.target.value);
+                    }}
                   />
                 </div>
               </>

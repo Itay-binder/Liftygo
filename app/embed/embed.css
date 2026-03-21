@@ -30,8 +30,8 @@ body.embed-route {
 .lg-header {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  padding: clamp(16px, 2.5vw, 22px) clamp(16px, 2.5vw, 24px);
+  gap: 8px;
+  padding: 10px 14px 12px;
   background: linear-gradient(180deg, #fff 0%, #f8fafc 100%);
   border-bottom: 1px solid #e2e8f0;
 }
@@ -69,30 +69,16 @@ body.embed-route {
   cursor: pointer;
 }
 
-.lg-hint {
-  font-size: 0.7rem;
-  color: #94a3b8;
-  margin-top: 4px;
-  line-height: 1.35;
-}
-
 .lg-title-block {
   flex: 1 1 220px;
 }
 
 .lg-title {
-  margin: 0 0 4px;
-  font-size: clamp(1.1rem, 2.5vw, 1.35rem);
+  margin: 0;
+  font-size: clamp(1.05rem, 2.2vw, 1.28rem);
   font-weight: 700;
   letter-spacing: -0.02em;
   color: #0f172a;
-}
-
-.lg-sub {
-  margin: 0;
-  font-size: 0.8125rem;
-  color: #64748b;
-  line-height: 1.4;
 }
 
 .lg-field {
@@ -126,6 +112,17 @@ body.embed-route {
 .lg-input:focus {
   border-color: #3b82f6;
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+}
+
+.lg-input[readonly] {
+  background: #f1f5f9;
+  color: #334155;
+  cursor: default;
+}
+
+.lg-input[readonly]:focus {
+  border-color: #cbd5e1;
+  box-shadow: none;
 }
 
 .lg-actions {
@@ -172,7 +169,7 @@ body.embed-route {
 }
 
 .lg-body {
-  padding: clamp(12px, 2vw, 20px) clamp(12px, 2vw, 24px) clamp(20px, 3vw, 28px);
+  padding: 8px 14px 16px;
 }
 
 .lg-muted {
