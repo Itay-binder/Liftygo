@@ -7,6 +7,7 @@ import {
   PRESET_OPTIONS,
   type PresetId,
 } from "@/lib/timeRange";
+import EmbedUserMenu from "./EmbedUserMenu";
 
 /** חייב להתאים לסקריפט ההטמעה באלמנטור */
 export const LIFTYGO_EMBED_MSG = "liftygo-embed-height" as const;
@@ -87,6 +88,10 @@ export default function EmbedDashboard() {
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState<string | null>(null);
   const [data, setData] = useState<ApiOk | null>(null);
+  const [accountMenu, setAccountMenu] = useState<{
+    show: boolean;
+    email: string | null;
+  }>({ show: false, email: null });
 
   const onPresetChange = (next: PresetId) => {
     if (next === "custom" && preset !== "custom" && preset !== "all") {
@@ -155,12 +160,17 @@ export default function EmbedDashboard() {
         (me: {
           ok?: boolean;
           authDisabled?: boolean;
+          user?: { email?: string };
           profile?: { role?: string; utmSource?: string };
         }) => {
           if (me.ok && !me.authDisabled && me.profile?.role === "partner") {
             setUtm(me.profile.utmSource ?? "");
             setUtmLocked(true);
           }
+          setAccountMenu({
+            show: Boolean(me.ok && !me.authDisabled),
+            email: me.user?.email ?? null,
+          });
         }
       )
       .finally(() => setBooting(false));
@@ -194,8 +204,16 @@ export default function EmbedDashboard() {
     <div className="lg-root">
       <div className="lg-card">
         <header className="lg-header">
-          <div className="lg-title-block">
-            <h1 className="lg-title">דשבורד Liftygo</h1>
+          <div className="lg-header-row">
+            <div className="lg-title-block">
+              <h1 className="lg-title">דשבורד Liftygo</h1>
+            </div>
+            {accountMenu.show && (
+              <EmbedUserMenu
+                email={accountMenu.email}
+                onLogout={logout}
+              />
+            )}
           </div>
 
           <div className="lg-filters-grid">
@@ -287,21 +305,6 @@ export default function EmbedDashboard() {
               {data && (
                 <span className="lg-badge">{data.count} רשומות</span>
               )}
-              <button
-                type="button"
-                onClick={() => void logout()}
-                style={{
-                  padding: "10px 14px",
-                  borderRadius: 10,
-                  border: "1px solid #cbd5e1",
-                  background: "#fff",
-                  color: "#64748b",
-                  cursor: "pointer",
-                  fontSize: 13,
-                }}
-              >
-                התנתקות
-              </button>
             </div>
           </div>
         </header>
