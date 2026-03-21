@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { authDisabled, getSessionWithProfile } from "@/lib/auth/session";
+import PendingLogoutButton from "./PendingLogoutButton";
 
 export const dynamic = "force-dynamic";
 
@@ -40,6 +41,7 @@ export default async function PendingPage() {
           החשבון <strong dir="ltr">{s.profile.email}</strong> ממתין לאישור
           מנהל לפני גישה לדשבורד.
         </p>
+        <PendingLogoutButton />
       </div>
     </main>
   );

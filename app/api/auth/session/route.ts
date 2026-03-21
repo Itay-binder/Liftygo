@@ -2,11 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { mayCreateSession } from "@/lib/auth/invites";
 import { ensureUserDoc } from "@/lib/auth/profile";
 import { authDisabled, SESSION_COOKIE } from "@/lib/auth/session";
+import { getSessionExpiresMs } from "@/lib/auth/sessionDuration";
 import { getAdminAuth } from "@/lib/firebase/admin";
 
 export const dynamic = "force-dynamic";
-
-const EXPIRES_MS = 1000 * 60 * 60 * 24 * 5; // 5 days
 
 export async function POST(req: NextRequest) {
   if (authDisabled()) {
@@ -35,8 +34,9 @@ export async function POST(req: NextRequest) {
       );
     }
     await ensureUserDoc(decoded.uid, decoded.email);
+    const expiresMs = getSessionExpiresMs();
     const sessionCookie = await auth.createSessionCookie(idToken, {
-      expiresIn: EXPIRES_MS,
+      expiresIn: expiresMs,
     });
     const res = NextResponse.json({ ok: true });
     res.cookies.set(SESSION_COOKIE, sessionCookie, {
@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
       path: "/",
-      maxAge: Math.floor(EXPIRES_MS / 1000),
+      maxAge: Math.floor(expiresMs / 1000),
     });
     return res;
   } catch (e) {

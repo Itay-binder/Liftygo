@@ -1,4 +1,5 @@
 import { FieldValue } from "firebase-admin/firestore";
+import { getInviteDataForEmail } from "@/lib/auth/inviteLookup";
 import { getAdminDb } from "@/lib/firebase/admin";
 import type { UserProfile } from "@/lib/auth/types";
 
@@ -38,10 +39,19 @@ export async function ensureUserDoc(
   }
 
   const admin = isAdminEmail(email);
+  let utmFromInvite = "";
+  if (!admin && email) {
+    const inv = await getInviteDataForEmail(email);
+    const raw = inv?.utmSource;
+    if (typeof raw === "string" && raw.trim()) {
+      utmFromInvite = raw.trim();
+    }
+  }
+
   const profile: UserProfile = {
     email: email ?? "",
     role: admin ? "admin" : "partner",
-    utmSource: "",
+    utmSource: admin ? "" : utmFromInvite,
     approved: admin,
   };
 
