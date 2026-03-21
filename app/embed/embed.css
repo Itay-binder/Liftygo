@@ -29,12 +29,51 @@ body.embed-route {
 
 .lg-header {
   display: flex;
-  flex-wrap: wrap;
-  gap: 14px;
-  align-items: flex-end;
+  flex-direction: column;
+  gap: 16px;
   padding: clamp(16px, 2.5vw, 22px) clamp(16px, 2.5vw, 24px);
   background: linear-gradient(180deg, #fff 0%, #f8fafc 100%);
   border-bottom: 1px solid #e2e8f0;
+}
+
+.lg-filters-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 14px;
+  align-items: end;
+}
+
+.lg-filters-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: flex-end;
+  grid-column: 1 / -1;
+}
+
+@media (min-width: 900px) {
+  .lg-filters-actions {
+    grid-column: auto;
+    justify-content: flex-end;
+  }
+}
+
+.lg-select {
+  width: 100%;
+  padding: 11px 14px;
+  border-radius: 10px;
+  border: 1px solid #cbd5e1;
+  background: #fff;
+  color: #0f172a;
+  font-size: 0.9375rem;
+  cursor: pointer;
+}
+
+.lg-hint {
+  font-size: 0.7rem;
+  color: #94a3b8;
+  margin-top: 4px;
+  line-height: 1.35;
 }
 
 .lg-title-block {

@@ -1,4 +1,5 @@
 import { google } from "googleapis";
+import { parseCellToYmd } from "@/lib/dateParse";
 
 function getServiceAccountCredentials(): {
   client_email: string;
@@ -86,4 +87,37 @@ export function filterByUtmSource(
   if (!utm?.trim()) return records;
   const needle = utm.trim().toLowerCase();
   return records.filter((r) => pickUtmSource(r).toLowerCase() === needle);
+}
+
+export function resolveDateColumn(headers: string[]): string {
+  const env = process.env.GOOGLE_DATE_COLUMN?.trim();
+  if (env && headers.includes(env)) return env;
+  const candidates = ["תאריך הזמנה", "תאריך"];
+  for (const c of candidates) {
+    if (headers.includes(c)) return c;
+  }
+  const fuzzy = headers.find((h) => h.includes("תאריך"));
+  return fuzzy ?? "";
+}
+
+export function filterByDateRange(
+  records: Record<string, string>[],
+  headers: string[],
+  dateFrom: string | null,
+  dateTo: string | null
+): Record<string, string>[] {
+  if (!dateFrom?.trim() && !dateTo?.trim()) return records;
+  const col = resolveDateColumn(headers);
+  if (!col) return records;
+
+  const from = dateFrom?.trim() ?? "";
+  const to = dateTo?.trim() ?? "";
+
+  return records.filter((row) => {
+    const ymd = parseCellToYmd(row[col] ?? "");
+    if (!ymd) return false;
+    if (from && ymd < from) return false;
+    if (to && ymd > to) return false;
+    return true;
+  });
 }
