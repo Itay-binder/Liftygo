@@ -1,13 +1,18 @@
 /**
- * Liftygo affiliate dashboard — external embed for Elementor.
- * Load once: <script src="embed.js" data-api-base="https://..." defer></script>
+ * Liftygo affiliate dashboard — embed for Elementor.
+ *
+ * מומלץ (קובץ חיצוני): הוסף לפני הסקריפט
+ *   <div id="liftygo-affiliate-dashboard"></div>
+ *   <script src=".../embed.js" defer data-api-base="https://.../api"></script>
+ *
+ * או הגדר לפני: window.AFFILIATE_DASHBOARD_API_BASE = 'https://.../api';
  */
 (function () {
   'use strict';
 
-  var SCRIPT = document.currentScript;
+  var EXEC_SCRIPT = document.currentScript;
   var API_BASE =
-    (SCRIPT && SCRIPT.getAttribute('data-api-base')) ||
+    (EXEC_SCRIPT && EXEC_SCRIPT.getAttribute('data-api-base')) ||
     (typeof window !== 'undefined' && window.AFFILIATE_DASHBOARD_API_BASE) ||
     '';
 
@@ -305,7 +310,12 @@
   }
 
   function insertMountPoint() {
-    var anchor = SCRIPT;
+    var host = document.getElementById('liftygo-affiliate-dashboard');
+    if (host) {
+      mount(host);
+      return;
+    }
+    var anchor = EXEC_SCRIPT;
     var root = document.createElement('div');
     root.id = 'liftygo-affiliate-dashboard-root';
     if (anchor && anchor.parentNode) {

@@ -19,11 +19,14 @@
 - **`public/embed.js`** — נטען בשורה אחת באלמנטור; ב-Vercel זמין ב־`https://YOUR_PROJECT.vercel.app/embed.js`.
 - **`api/affiliate-data.js`** — קורא מ-Google Sheets עם Service Account מ-`GOOGLE_SERVICE_ACCOUNT_JSON` (רק ב-Vercel).
 
-## הטמעה באלמנטור (שורה אחת)
+## הטמעה באלמנטור (ווידג'ט HTML)
 
-אם הפרויקט ב-Vercel מחובר לריפו, אפשר להשתמש ישירות ב־`/embed.js` של אותו דומיין:
+הקוד יושב **באתר הוורדפרס** (אלמנטור), אבל **הלוגיקה** נטענת מ-URL של Vercel — כך לא מדביקים אלפי שורות בדף.
+
+הדבק ב**אותו** ווידג'ט HTML (מעל הסקריפט — `div` ריק שמסמן איפה הדשבורד יופיע):
 
 ```html
+<div id="liftygo-affiliate-dashboard"></div>
 <script
   src="https://YOUR_VERCEL_PROJECT.vercel.app/embed.js"
   data-api-base="https://YOUR_VERCEL_PROJECT.vercel.app/api"
@@ -31,7 +34,19 @@
 ></script>
 ```
 
-חלופה: להעלות את `public/embed.js` למדיה בוורדפרס / CDN.
+חלופה ל־`data-api-base` (אותו ווידג'ט, לפני ה־`script` עם `src`):
+
+```html
+<div id="liftygo-affiliate-dashboard"></div>
+<script>
+  window.AFFILIATE_DASHBOARD_API_BASE = 'https://YOUR_VERCEL_PROJECT.vercel.app/api';
+</script>
+<script src="https://YOUR_VERCEL_PROJECT.vercel.app/embed.js" defer></script>
+```
+
+**לא מומלץ** להדביק את כל תוכן `embed.js` פנימה: וורדפרס/אלמנטור לפעמים חותכים או מסננים סקריפטים ארוכים, וקשה לעדכן גרסאות. אם בכל זאת מדביקים inline — השאר את אותו `div` עם `id="liftygo-affiliate-dashboard"` מעל הסקריפט.
+
+חלופה: להעלות את `public/embed.js` למדיה בוורדפרס ולהחליף ב־`src` את כתובת ה-Vercel.
 
 - **`data-api-base`** — כתובת בסיס ל-API (ללא סלאש בסוף). אם לא מוגדר, הסקריפט ישתמש ב־`window.AFFILIATE_DASHBOARD_API_BASE` אם קיים.
 
