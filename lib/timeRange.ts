@@ -1,9 +1,4 @@
 import {
-  addDays,
-  addMonths,
-  addQuarters,
-  addWeeks,
-  addYears,
   endOfMonth,
   endOfQuarter,
   endOfWeek,
@@ -20,25 +15,21 @@ import {
   subYears,
 } from "date-fns";
 
+/** ללא אפשרויות "עתיד" — רק היסטוריה / הווה / טווח מותאם */
 export type PresetId =
   | "all"
   | "last7days"
   | "last30days"
   | "yesterday"
   | "today"
-  | "tomorrow"
   | "this_week"
   | "last_week"
-  | "next_week"
   | "this_month"
   | "last_month"
-  | "next_month"
   | "this_quarter"
   | "last_quarter"
-  | "next_quarter"
   | "this_year"
   | "last_year"
-  | "next_year"
   | "till_date"
   | "custom";
 
@@ -63,10 +54,6 @@ export function getPresetRange(
     }
     case "today":
       return { from: fmt(now), to: fmt(now) };
-    case "tomorrow": {
-      const t = addDays(now, 1);
-      return { from: fmt(t), to: fmt(t) };
-    }
     case "this_week":
       return {
         from: fmt(startOfWeek(now, weekOpts)),
@@ -79,21 +66,10 @@ export function getPresetRange(
         to: fmt(endOfWeek(ref, weekOpts)),
       };
     }
-    case "next_week": {
-      const ref = addWeeks(now, 1);
-      return {
-        from: fmt(startOfWeek(ref, weekOpts)),
-        to: fmt(endOfWeek(ref, weekOpts)),
-      };
-    }
     case "this_month":
       return { from: fmt(startOfMonth(now)), to: fmt(endOfMonth(now)) };
     case "last_month": {
       const ref = subMonths(now, 1);
-      return { from: fmt(startOfMonth(ref)), to: fmt(endOfMonth(ref)) };
-    }
-    case "next_month": {
-      const ref = addMonths(now, 1);
       return { from: fmt(startOfMonth(ref)), to: fmt(endOfMonth(ref)) };
     }
     case "this_quarter":
@@ -102,18 +78,10 @@ export function getPresetRange(
       const ref = subQuarters(now, 1);
       return { from: fmt(startOfQuarter(ref)), to: fmt(endOfQuarter(ref)) };
     }
-    case "next_quarter": {
-      const ref = addQuarters(startOfQuarter(now), 1);
-      return { from: fmt(ref), to: fmt(endOfQuarter(ref)) };
-    }
     case "this_year":
       return { from: fmt(startOfYear(now)), to: fmt(endOfYear(now)) };
     case "last_year": {
       const ref = subYears(now, 1);
-      return { from: fmt(startOfYear(ref)), to: fmt(endOfYear(ref)) };
-    }
-    case "next_year": {
-      const ref = addYears(now, 1);
       return { from: fmt(startOfYear(ref)), to: fmt(endOfYear(ref)) };
     }
     case "till_date":
@@ -131,19 +99,14 @@ export const PRESET_OPTIONS: { value: PresetId; label: string }[] = [
   { value: "last30days", label: "30 ימים אחרונים" },
   { value: "yesterday", label: "אתמול" },
   { value: "today", label: "היום" },
-  { value: "tomorrow", label: "מחר" },
   { value: "this_week", label: "השבוע" },
   { value: "last_week", label: "שבוע שעבר" },
-  { value: "next_week", label: "שבוע הבא" },
   { value: "this_month", label: "החודש" },
   { value: "last_month", label: "חודש שעבר" },
-  { value: "next_month", label: "חודש הבא" },
   { value: "this_quarter", label: "הרבעון" },
   { value: "last_quarter", label: "הרבעון הקודם" },
-  { value: "next_quarter", label: "הרבעון הבא" },
   { value: "this_year", label: "השנה" },
   { value: "last_year", label: "שנה שעברה" },
-  { value: "next_year", label: "שנה הבאה" },
   { value: "till_date", label: "עד היום" },
   { value: "custom", label: "מותאם (מתאריך / עד תאריך)" },
 ];

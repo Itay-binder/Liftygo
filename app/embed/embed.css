@@ -8,7 +8,7 @@ body.embed-route {
 
 .lg-root {
   min-height: 100%;
-  padding: clamp(12px, 2vw, 24px);
+  padding: clamp(8px, 1.5vw, 16px);
   background: linear-gradient(160deg, #f1f5f9 0%, #e8eef5 45%, #f8fafc 100%);
   color: #0f172a;
   font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Heebo", Arial,
@@ -30,8 +30,8 @@ body.embed-route {
 .lg-header {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  padding: 10px 14px 12px;
+  gap: 2px;
+  padding: 4px 12px 8px;
   background: linear-gradient(180deg, #fff 0%, #f8fafc 100%);
   border-bottom: 1px solid #e2e8f0;
 }
@@ -70,14 +70,18 @@ body.embed-route {
 }
 
 .lg-title-block {
-  flex: 1 1 220px;
+  flex: 0 0 auto;
+  margin: 0;
+  padding: 0;
 }
 
 .lg-title {
   margin: 0;
+  padding: 0;
   font-size: clamp(1.05rem, 2.2vw, 1.28rem);
   font-weight: 700;
   letter-spacing: -0.02em;
+  line-height: 1.15;
   color: #0f172a;
 }
 
