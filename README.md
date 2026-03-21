@@ -1,2 +1,60 @@
-# Liftygo
-A unified dashboard for tracking and managing affiliate marketing performance and analytics.
+# Liftygo — דשבורד שותפים
+
+דשבורד למשווקי שותפים עם פרונטנד כווידג'ט חיצוני (סקריפט אחד לאלמנטור), ו-Backend מאובטח שמושך נתונים מ-Google Sheets בלי לחשוף מפתחות API בדף.
+
+## מבנה המאגר
+
+```
+.
+├── README.md
+├── .gitignore
+├── api/                 # פונקציות שרת (למשל Vercel Serverless) — יגשו ל-Google Sheets
+├── frontend/
+│   ├── embed.js         # נקודת הכניסה לאלמנטור: קובץ JS חיצוני אחד
+│   └── dev.html         # דף בדיקה מקומית (לא לחשוף לייצור כ-URL ציבורי נדרש)
+```
+
+- **`frontend/embed.js`** — נטען בשורה אחת באלמנטור; יוצר את ה-DOM, קורא `utm_source`, מציג פילטר תאריכים וטבלה, וקורא ל-API ב-Backend.
+- **`api/`** — כאן יוגדרו הנתיבים המאובטחים (משיכה מ-Sheets, אימות עתידי). המפתחות יושבים רק במשתני סביבה בצד השרת.
+
+## הטמעה באלמנטור (שורה אחת)
+
+העלה את `frontend/embed.js` ל-CDN או לתיקיית מדיה בוורדפרס, והדבק בווידג'ט HTML מותאם אישית:
+
+```html
+<script
+  src="https://YOUR_DOMAIN/path/embed.js"
+  data-api-base="https://YOUR_VERCEL_PROJECT.vercel.app/api"
+  defer
+></script>
+```
+
+- **`data-api-base`** — כתובת בסיס ל-API (ללא סלאש בסוף). אם לא מוגדר, הסקריפט ישתמש בערך ב-`window.AFFILIATE_DASHBOARD_API_BASE` אם קיים.
+
+## שלב נוכחי (UTM ונתונים)
+
+1. זיהוי שותף לפי `utm_source` ב-`window.location.search`.
+2. קריאה ל-Backend (עדיין שלד) שיחזיר רק שורות רלוונטיות לשותף — **לא** יחשוף מפתחות Google בדפדפן.
+
+## שלבים הבאים (מתוכנן)
+
+- אימות עם שם משתמש וסיסמה לכל לקוח.
+- חיבור מלא ל-Google Sheets דרך `api/`.
+- בניית Tailwind לייצור (build) במקום CDN, לביצועים ולשליטה במחלקות.
+
+## פיתוח מקומי
+
+פתח את `frontend/dev.html` בדפדפן (או דרך שרת סטטי פשוט) כדי לבדוק את הווידג'ט. הוסף לכתובת פרמטרים לבדיקה, למשל: `?utm_source=demo_partner`.
+
+## דרישות גיליון (מומלץ)
+
+עמודות צפויות בשלב הראשון (ניתן להתאים ב-API):
+
+| עמודה        | תיאור                          |
+|-------------|---------------------------------|
+| `utm_source`| מזהה שותף (חייב להתאים ל-URL)   |
+| `date`      | תאריך האירוע (ISO או פורמט אחיד) |
+
+## רישיון
+
+לפי הגדרת הבעלים של המאגר.
