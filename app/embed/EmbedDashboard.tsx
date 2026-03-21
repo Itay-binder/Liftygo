@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   getPresetRange,
   PRESET_OPTIONS,
@@ -16,6 +16,7 @@ type ApiOk = {
   headers: string[];
   count: number;
   rows: Record<string, string>[];
+  warning?: string;
 };
 
 type ApiErr = { ok: false; error: string };
@@ -66,10 +67,13 @@ function useEmbedHeightNotify(
 }
 
 export default function EmbedDashboard() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const initialUtm = searchParams.get("utm_source") ?? "";
 
   const [utm, setUtm] = useState(initialUtm);
+  const [utmLocked, setUtmLocked] = useState(false);
+  const [booting, setBooting] = useState(true);
   const [preset, setPreset] = useState<PresetId>(() =>
     parsePresetParam(searchParams.get("range"))
   );
@@ -124,7 +128,11 @@ export default function EmbedDashboard() {
     setErr(null);
     try {
       const url = query ? `/api/orders?${query}` : "/api/orders";
-      const res = await fetch(url, { cache: "no-store" });
+      const res = await fetch(url, { cache: "no-store", credentials: "include" });
+      if (res.status === 401) {
+        window.location.href = "/login?returnTo=" + encodeURIComponent("/embed");
+        return;
+      }
       const json = (await res.json()) as ApiOk | ApiErr;
       if (!json.ok) {
         setData(null);
@@ -141,10 +149,35 @@ export default function EmbedDashboard() {
   }, [query]);
 
   useEffect(() => {
-    void load();
-  }, [load]);
+    void fetch("/api/auth/me", { credentials: "include" })
+      .then((r) => r.json())
+      .then(
+        (me: {
+          ok?: boolean;
+          authDisabled?: boolean;
+          profile?: { role?: string; utmSource?: string };
+        }) => {
+          if (me.ok && !me.authDisabled && me.profile?.role === "partner") {
+            setUtm(me.profile.utmSource ?? "");
+            setUtmLocked(true);
+          }
+        }
+      )
+      .finally(() => setBooting(false));
+  }, []);
 
-  useEmbedHeightNotify(loading, data?.rows?.length, err);
+  useEffect(() => {
+    if (booting) return;
+    void load();
+  }, [booting, load]);
+
+  useEmbedHeightNotify(loading || booting, data?.rows?.length, err);
+
+  async function logout() {
+    await fetch("/api/auth/session", { method: "DELETE", credentials: "include" });
+    router.push("/login");
+    router.refresh();
+  }
 
   const displayHeaders = data?.headers?.length
     ? data.headers
@@ -178,6 +211,12 @@ export default function EmbedDashboard() {
                 placeholder="לדוגמה: meta, ig"
                 dir="ltr"
                 autoComplete="off"
+                readOnly={utmLocked}
+                title={
+                  utmLocked
+                    ? "שותף: הסינון לפי utm_source נקבע על ידי המנהל"
+                    : undefined
+                }
               />
             </div>
 
@@ -241,29 +280,55 @@ export default function EmbedDashboard() {
                 type="button"
                 className="lg-btn"
                 onClick={() => void load()}
+                disabled={booting}
               >
                 רענן
               </button>
               {data && (
                 <span className="lg-badge">{data.count} רשומות</span>
               )}
+              <button
+                type="button"
+                onClick={() => void logout()}
+                style={{
+                  padding: "10px 14px",
+                  borderRadius: 10,
+                  border: "1px solid #cbd5e1",
+                  background: "#fff",
+                  color: "#64748b",
+                  cursor: "pointer",
+                  fontSize: 13,
+                }}
+              >
+                התנתקות
+              </button>
             </div>
           </div>
         </header>
 
         <div className="lg-body">
-          {loading && <p className="lg-muted">טוען נתונים…</p>}
-          {err && !loading && (
+          {(loading || booting) && <p className="lg-muted">טוען נתונים…</p>}
+          {err && !loading && !booting && (
             <p className="lg-error" role="alert">
               {err}
             </p>
           )}
 
-          {!loading && data && data.rows.length === 0 && (
+          {!loading && !booting && data?.warning && (
+            <p className="lg-error" role="status">
+              {data.warning}
+            </p>
+          )}
+
+          {!loading &&
+            !booting &&
+            data &&
+            !data.warning &&
+            data.rows.length === 0 && (
             <p className="lg-muted">אין שורות שתואמות את הסינון.</p>
           )}
 
-          {!loading && data && data.rows.length > 0 && (
+          {!loading && !booting && data && data.rows.length > 0 && (
             <div className="lg-table-scroll">
               <table className="lg-table">
                 <thead>
