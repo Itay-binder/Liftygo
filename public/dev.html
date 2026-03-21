@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Liftygo — בדיקת embed</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="min-h-screen bg-slate-50 p-6 text-slate-900">
+    <p class="mb-4 text-sm text-slate-600">
+      דף בדיקה: הוסף
+      <code class="rounded bg-slate-200 px-1">?utm_source=demo</code>
+      לכתובת.
+    </p>
+    <div id="liftygo-affiliate-dashboard"></div>
+    <script>
+      window.AFFILIATE_DASHBOARD_API_BASE = window.location.origin + '/api';
+    </script>
+    <script src="./embed.js" defer></script>
+  </body>
+</html>
