@@ -122,6 +122,8 @@ export default function EmbedDashboard() {
   const [pendingEmail, setPendingEmail] = useState<string | null>(null);
   const [columnPrefs, setColumnPrefs] = useState<ColumnPrefs | null>(null);
   const [columnsModalOpen, setColumnsModalOpen] = useState(false);
+  /** כבוי = מסתיר שורות «לא אושר» מהטבלה (המונה נשאר מלא) */
+  const [showNonQualifyingRows, setShowNonQualifyingRows] = useState(true);
 
   const onPresetChange = (next: PresetId) => {
     if (next === "custom" && preset !== "custom" && preset !== "all") {
@@ -256,9 +258,27 @@ export default function EmbedDashboard() {
     setColumnPrefs(mergeColumnPrefs(data.headers, saved));
   }, [data?.headers]);
 
+  const displayHeaders = useMemo(() => {
+    if (!data?.headers?.length) return ["אין עמודות"];
+    if (!columnPrefs) return data.headers;
+    const hidden = hiddenSet(columnPrefs);
+    return columnPrefs.order.filter((h) => !hidden.has(h));
+  }, [data?.headers, columnPrefs]);
+
+  const nonQualifyingCount = useMemo(() => {
+    if (!data?.rows?.length) return 0;
+    return data.rows.filter(isNonQualifyingLeadRow).length;
+  }, [data?.rows]);
+
+  const displayRows = useMemo(() => {
+    if (!data?.rows?.length) return [];
+    if (showNonQualifyingRows) return data.rows;
+    return data.rows.filter((row) => !isNonQualifyingLeadRow(row));
+  }, [data?.rows, showNonQualifyingRows]);
+
   useEmbedHeightNotify(
     loading || booting || pendingApproval,
-    data?.rows?.length,
+    displayRows.length,
     err,
     columnsModalOpen
   );
@@ -275,18 +295,6 @@ export default function EmbedDashboard() {
     });
     window.location.href = "/login?returnTo=" + encodeURIComponent("/embed");
   }
-
-  const displayHeaders = useMemo(() => {
-    if (!data?.headers?.length) return ["אין עמודות"];
-    if (!columnPrefs) return data.headers;
-    const hidden = hiddenSet(columnPrefs);
-    return columnPrefs.order.filter((h) => !hidden.has(h));
-  }, [data?.headers, columnPrefs]);
-
-  const nonQualifyingCount = useMemo(() => {
-    if (!data?.rows?.length) return 0;
-    return data.rows.filter(isNonQualifyingLeadRow).length;
-  }, [data?.rows]);
 
   const presetRange =
     preset !== "all" && preset !== "custom" ? getPresetRange(preset) : null;
@@ -447,12 +455,54 @@ export default function EmbedDashboard() {
               {data && (
                 <>
                   <span className="lg-badge">{data.count} רשומות</span>
-                  <span
-                    className="lg-badge lg-badge-nonqual"
-                    title='מספר שורות שבהן בעמודה «סטטוס ליד» מופיע «לא אושר» (לא מזכה בתשלום)'
+                  <button
+                    type="button"
+                    className={`lg-badge lg-badge-nonqual lg-badge-nonqual-toggle ${!showNonQualifyingRows ? "is-off" : ""}`}
+                    disabled={nonQualifyingCount === 0}
+                    onClick={() =>
+                      setShowNonQualifyingRows((v) => !v)
+                    }
+                    aria-pressed={showNonQualifyingRows}
+                    title={
+                      showNonQualifyingRows
+                        ? "לחץ להסתרת שורות לא מזכות מהטבלה (המונה נשאר)"
+                        : "לחץ להצגת שורות לא מזכות בטבלה"
+                    }
                   >
-                    {nonQualifyingCount} לא מזכות
-                  </span>
+                    {showNonQualifyingRows ? (
+                      <svg
+                        className="lg-badge-nonqual-eye"
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="1.75"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        aria-hidden
+                      >
+                        <path d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                        <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      </svg>
+                    ) : (
+                      <svg
+                        className="lg-badge-nonqual-eye"
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="1.75"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        aria-hidden
+                      >
+                        <path d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L4.5 4.5m1.728 1.728L19.07 19.07l-1.728 1.728L6.228 6.228z" />
+                      </svg>
+                    )}
+                    <span>{nonQualifyingCount} לא מזכות</span>
+                  </button>
                 </>
               )}
             </div>
@@ -496,6 +546,19 @@ export default function EmbedDashboard() {
             !booting &&
             data &&
             data.rows.length > 0 &&
+            displayRows.length === 0 &&
+            displayHeaders.length > 0 && (
+            <p className="lg-muted" role="status">
+              שורות לא מזכות מוסתרות. לחץ על העין ב־«לא מזכות» כדי להציג את
+              כולן.
+            </p>
+          )}
+
+          {!loading &&
+            !booting &&
+            data &&
+            data.rows.length > 0 &&
+            displayRows.length > 0 &&
             displayHeaders.length > 0 && (
             <div className="lg-table-scroll">
               <table className="lg-table">
@@ -507,7 +570,7 @@ export default function EmbedDashboard() {
                   </tr>
                 </thead>
                 <tbody>
-                  {data.rows.map((row, i) => (
+                  {displayRows.map((row, i) => (
                     <tr
                       key={i}
                       className={
