@@ -2,6 +2,7 @@ import { FieldValue } from "firebase-admin/firestore";
 import { getInviteDataForEmail } from "@/lib/auth/inviteLookup";
 import { getAdminDb } from "@/lib/firebase/admin";
 import type { UserProfile } from "@/lib/auth/types";
+import { pickUtmFromRecord } from "@/lib/auth/utmField";
 
 /** מזהה אם האימייל מוגדר כאדמין (משתני סביבה) */
 export function isAdminEmail(email: string | undefined): boolean {
@@ -20,7 +21,7 @@ export async function getUserProfile(uid: string): Promise<UserProfile | null> {
   return {
     email: String(d.email ?? ""),
     role: d.role === "admin" ? "admin" : "partner",
-    utmSource: String(d.utmSource ?? ""),
+    utmSource: pickUtmFromRecord(d),
     approved: Boolean(d.approved),
   };
 }
@@ -33,19 +34,36 @@ export async function ensureUserDoc(
   const db = getAdminDb();
   const ref = db.collection("users").doc(uid);
   const snap = await ref.get();
+  const admin = isAdminEmail(email);
+
   if (snap.exists) {
     const p = await getUserProfile(uid);
-    if (p) return p;
+    if (p) {
+      if (
+        !admin &&
+        email &&
+        p.role === "partner" &&
+        !p.utmSource.trim()
+      ) {
+        const inv = await getInviteDataForEmail(email);
+        const utm = pickUtmFromRecord(inv ?? undefined);
+        if (utm) {
+          await ref.update({
+            utmSource: utm,
+            updatedAt: FieldValue.serverTimestamp(),
+          });
+          const again = await getUserProfile(uid);
+          if (again) return again;
+        }
+      }
+      return p;
+    }
   }
 
-  const admin = isAdminEmail(email);
   let utmFromInvite = "";
   if (!admin && email) {
     const inv = await getInviteDataForEmail(email);
-    const raw = inv?.utmSource;
-    if (typeof raw === "string" && raw.trim()) {
-      utmFromInvite = raw.trim();
-    }
+    utmFromInvite = pickUtmFromRecord(inv ?? undefined);
   }
 
   const profile: UserProfile = {
