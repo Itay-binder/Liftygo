@@ -4,6 +4,17 @@
  * ==============================
  */
 
+/* דף מלא להטמעה ב-iframe — פחות “מסגרת”, בלי מרווח לבן מיותר */
+html.liftygo-embed-page,
+html.liftygo-embed-page body {
+  margin: 0;
+  padding: 0;
+  background: transparent;
+}
+html.liftygo-embed-page {
+  overflow-x: clip;
+}
+
 /* === 1. TOKENS & BASE STYLES === */
 :root{
     --bg:#f7f7fb;

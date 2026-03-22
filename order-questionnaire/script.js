@@ -51,6 +51,35 @@ document.addEventListener('DOMContentLoaded', () => {
     let pickupAutocomplete = null; // שמירת autocomplete objects לגישה מהולידציה
     let dropoffAutocomplete = null;
 
+    /** גובה לדף האב (iframe) — מפחית גלילה כפולה */
+    const postOrderEmbedHeight = () => {
+        if (window.parent === window) return;
+        const pad = 16;
+        const h = Math.ceil(
+            Math.max(
+                document.documentElement.scrollHeight,
+                document.body.scrollHeight
+            ) + pad
+        );
+        window.parent.postMessage({ type: 'liftygo-order-embed-height', height: h }, '*');
+    };
+    let orderEmbedHeightTimer = null;
+    const scheduleOrderEmbedHeight = () => {
+        clearTimeout(orderEmbedHeightTimer);
+        orderEmbedHeightTimer = setTimeout(() => {
+            requestAnimationFrame(postOrderEmbedHeight);
+        }, 60);
+    };
+    if (window.parent !== window) {
+        window.addEventListener('resize', scheduleOrderEmbedHeight);
+        if (typeof ResizeObserver !== 'undefined') {
+            const orderEmbedRo = new ResizeObserver(() => scheduleOrderEmbedHeight());
+            orderEmbedRo.observe(document.body);
+            const bookEl = document.getElementById('book');
+            if (bookEl) orderEmbedRo.observe(bookEl);
+        }
+    }
+
     // משך הנפשה קצרה - 0ms כדי לבטל אותה במעבר משלב 1 ל-2
     const QUICK_ANIMATION_DURATION = 0; 
     const ACCESS_ANIMATION_DURATION = 1500; // 0.5 שניות לאנימציות של שלב 2->3 ו-3->4
@@ -302,6 +331,7 @@ if(currentStep === 1){
         }
         
         window.scrollTo({ top: 0, behavior: 'smooth' });
+        scheduleOrderEmbedHeight();
     };
 
     /** עדכון סרגל ההתקדמות */
@@ -1572,6 +1602,7 @@ window.addEventListener('pageshow', () => {
   if (step3) toggleAccessFields(step3);
 
   updateProgress();
+  scheduleOrderEmbedHeight();
 });
 
 // === Google Places (NEW API - OFFICIAL) ===
@@ -1700,4 +1731,6 @@ dropoffInput.addEventListener('input', () => {
 
 
     updateProgress();
+    scheduleOrderEmbedHeight();
+    setTimeout(scheduleOrderEmbedHeight, 400);
 });
